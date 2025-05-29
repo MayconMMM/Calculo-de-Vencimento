@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validação de Produto</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f2f5;
+      padding: 16px;
+    }
+    .container {
+      max-width: 480px;
+      margin: auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 24px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
+      color: #444;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      background-color: #0069d9;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0051b3;
+    }
+    #resultado {
+      margin-top: 24px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      color: #222;
+    }
+    @media (max-width: 400px) {
+      h2 { font-size: 20px; }
+      input, button { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Recebimento de Produto</h2>
+
+    <label for="fabricacao">Data de Fabricação:</label>
+    <input type="date" id="fabricacao">
+
+    <label for="vencimento">Data de Vencimento:</label>
+    <input type="date" id="vencimento">
+
+    <button onclick="verificar()">Verificar Validade</button>
+
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    function verificar() {
+      const fabricacao = new Date(document.getElementById("fabricacao").value);
+      const vencimento = new Date(document.getElementById("vencimento").value);
+      const hoje = new Date();
+      const resultado = document.getElementById("resultado");
+
+      if (!fabricacao || !vencimento || isNaN(fabricacao.getTime()) || isNaN(vencimento.getTime())) {
+        resultado.innerText = "Preencha corretamente as datas.";
+        return;
+      }
+
+      const validadeTotal = (vencimento - fabricacao) / (1000 * 60 * 60 * 24);
+      const diasConsumidos = (hoje - fabricacao) / (1000 * 60 * 60 * 24);
+      const porcentagemConsumida = (diasConsumidos / validadeTotal) * 100;
+      const limite = 60;
+
+      if (validadeTotal <= 0) {
+        resultado.innerText = "A data de vencimento deve ser após a fabricação.";
+        return;
+      }
+
+      if (diasConsumidos < 0) {
+        resultado.innerText = "A data de fabricação não pode estar no futuro.";
+        return;
+      }
+
+      resultado.innerHTML = `
+        ${diasConsumidos.toFixed(0)} dias desde a fabricação<br>
+        ${validadeTotal.toFixed(0)} dias totais de validade<br>
+        ${porcentagemConsumida.toFixed(2)}% da validade foi consumida<br><br>
+        ${porcentagemConsumida <= limite
+          ? "<span style='color: green;'>✅ Produto pode ser recebido</span>"
+          : "<span style='color: red;'>❌ Produto NÃO pode ser recebido</span>"
+        }
+      `;
+    }
+  </script>
+</body>
+</html>
